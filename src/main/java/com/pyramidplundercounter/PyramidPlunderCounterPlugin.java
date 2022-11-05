@@ -28,12 +28,13 @@ public class PyramidPlunderCounterPlugin extends Plugin
 	static final String GRAND_GOLD_CHEST_TARGET = "<col=ffff>Grand Gold Chest";
 	static final String SARCOPHAGUS_TARGET = "<col=ffff>Sarcophagus";
 	static final String SPEAR_TRAP = "<col=ffff>Speartrap";
-	int chestLooted = 0, sarcoLooted = 0;
+	int chestLooted = 0, sarcoLooted = 0, totalChestLooted = 0, totalSarcoLooted = 0;
 	int sarcoTimer = -1;
 
 	boolean usingChestOrSarco = false;
 	boolean usingSpearTrap = false;
 	boolean hasZombieSpawned = false;
+	boolean swarmSpawned = false;
 
 	List<NPC> spawnedNPC = new ArrayList<NPC>();
 
@@ -90,6 +91,7 @@ public class PyramidPlunderCounterPlugin extends Plugin
 					usingSpearTrap = false;
 				} else if (usingChestOrSarco) {
 					//Increment Chest count as you dont gain exp on unnsuccessful thieve.
+					totalChestLooted += 1;
 					chestLooted += 1;
 					usingChestOrSarco = false;
 				}
@@ -97,6 +99,7 @@ public class PyramidPlunderCounterPlugin extends Plugin
 			else if (usingChestOrSarco && statChanged.getSkill() == Skill.STRENGTH) {
 				//You gain exp on unsuccessful sarcophagus looting, hence only way to check if
 				//you were un(successful) is to see if a mummy spawned and it's targeting you
+				totalSarcoLooted += 1;
 				sarcoTimer = 7;
 				hasZombieSpawned = false;
 				usingChestOrSarco = false;
@@ -124,6 +127,11 @@ public class PyramidPlunderCounterPlugin extends Plugin
 	{
 		if (isInPyramidPlunder()) {
 			if (sarcoTimer > 0 && npcSpawned.getNpc().getName().equals("Mummy")) spawnedNPC.add(npcSpawned.getNpc());
+			// GRAND CHEST looting was unsuccessful if a scarab swarm spawns and targets you.
+			if (usingChestOrSarco && npcSpawned.getNpc().getName().equals("Scarab Swarm")) {
+				spawnedNPC.add(npcSpawned.getNpc());
+				swarmSpawned = true;
+			}
 		}
 	}
 
@@ -135,6 +143,11 @@ public class PyramidPlunderCounterPlugin extends Plugin
 				hasZombieSpawned = true;
 				spawnedNPC.clear();
 			}
+			if (swarmSpawned && spawnedNPC.contains(interactingChanged.getSource()) && interactingChanged.getTarget().equals(client.getLocalPlayer())) {
+				swarmSpawned = false;
+				totalChestLooted += 1;
+				spawnedNPC.clear();
+			}
 		}
 	}
 
@@ -142,6 +155,6 @@ public class PyramidPlunderCounterPlugin extends Plugin
 	{
 		return client.getLocalPlayer() != null
 				&& PYRAMID_PLUNDER_REGION == client.getLocalPlayer().getWorldLocation().getRegionID()
-				&& client.getVar(Varbits.PYRAMID_PLUNDER_TIMER) > 0;
+				&& client.getVarbitValue(Varbits.PYRAMID_PLUNDER_TIMER) > 0;
 	}
 }

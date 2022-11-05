@@ -26,4 +26,24 @@ public interface PyramidPlunderCounterConfig extends Config
 	default boolean showSarcoLooted() {
 		return true;
 	}
+
+	@ConfigItem(
+			position = 2,
+			keyName = "showTotalChestsLooted",
+			name = "Total Chests Looted",
+			description = "Displays the number of total chests looted. This includes both successful and unsuccessful attempts."
+	)
+	default boolean showTotalChestsLooted() {
+		return true;
+	}
+
+	@ConfigItem(
+			position = 3,
+			keyName = "showTotalSarcoLooted",
+			name = "Total Sarcophagus Looted",
+			description = "Displays the number of total Sarcophagus looted. This includes both successful and unsuccessful attempts."
+	)
+	default boolean showTotalSarcoLooted() {
+		return true;
+	}
 }

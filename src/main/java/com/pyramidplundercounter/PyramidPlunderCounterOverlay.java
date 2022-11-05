@@ -35,17 +35,28 @@ class PyramidPlunderCounterOverlay extends OverlayPanel {
         if (plugin.isInPyramidPlunder()) {
             List<LayoutableRenderableEntity> elems = panelComponent.getChildren();
             elems.clear();
-            panelComponent.setPreferredSize(new Dimension(160, 100));
+            panelComponent.setPreferredSize(new Dimension(200, 100));
+            if (config.showTotalChestsLooted())
+                elems.add(LineComponent.builder()
+                        .left("Total Chests Looted:")
+                        .right(String.format("%d", plugin.totalChestLooted))
+                        .build());
+
+            if (config.showTotalSarcoLooted())
+                elems.add(LineComponent.builder()
+                        .left("Total Sarcophagus Looted:")
+                        .right(String.format("%d", plugin.totalSarcoLooted))
+                        .build());
 
             if (config.showChestsLooted())
                 elems.add(LineComponent.builder()
-                        .left("Chests Looted:")
+                        .left("Chests Looted Successfully:")
                         .right(String.format("%d", plugin.chestLooted))
                         .build());
 
             if (config.showSarcoLooted())
                 elems.add(LineComponent.builder()
-                        .left("Sarcophagus Looted:")
+                        .left("Sarcophagus Looted Successfully:")
                         .right(String.format("%d", plugin.sarcoLooted))
                         .build());
         }
