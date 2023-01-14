@@ -1,7 +1,6 @@
 package com.pyramidplundercounter;
 
 import net.runelite.api.Client;
-import net.runelite.client.ui.overlay.OverlayMenuEntry;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LayoutableRenderableEntity;
@@ -10,9 +9,6 @@ import net.runelite.client.ui.overlay.components.LineComponent;
 import javax.inject.Inject;
 import java.awt.*;
 import java.util.List;
-
-import static net.runelite.api.MenuAction.RUNELITE_OVERLAY;
-import static net.runelite.client.ui.overlay.OverlayManager.OPTION_CONFIGURE;
 
 class PyramidPlunderCounterOverlay extends OverlayPanel {
 
@@ -58,6 +54,12 @@ class PyramidPlunderCounterOverlay extends OverlayPanel {
                 elems.add(LineComponent.builder()
                         .left("Sarcophagus Looted Successfully:")
                         .right(String.format("%d", plugin.sarcoLooted))
+                        .build());
+
+            if (config.showChance())
+                elems.add(LineComponent.builder()
+                        .left("% Chance of at least one Sceptre:")
+                        .right(String.format("%f", plugin.dryChance*100))
                         .build());
         }
         return super.render(graphics);

@@ -15,6 +15,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -23,13 +24,21 @@ import java.util.List;
 )
 public class PyramidPlunderCounterPlugin extends Plugin
 {
-
+	// Drop Chances
+	// Room 1 = 1/3500 0.000286
+	// Room 2 = 1/2250 0.000444
+	// Room 3 = 1/1250 0.0008
+	// Room 4 = 1/750 0.001333
+	// Room 5-8 = 1/650 0.001538
+	private HashMap<Integer, Double> sceptreChance = new HashMap<>();
 	private static final int PYRAMID_PLUNDER_REGION = 7749;
 	static final String GRAND_GOLD_CHEST_TARGET = "<col=ffff>Grand Gold Chest";
 	static final String SARCOPHAGUS_TARGET = "<col=ffff>Sarcophagus";
 	static final String SPEAR_TRAP = "<col=ffff>Speartrap";
 	int chestLooted = 0, sarcoLooted = 0, totalChestLooted = 0, totalSarcoLooted = 0;
 	int sarcoTimer = -1;
+	double totalChance = 1;
+	double dryChance = 0;
 
 	boolean usingChestOrSarco = false;
 	boolean usingSpearTrap = false;
@@ -54,6 +63,14 @@ public class PyramidPlunderCounterPlugin extends Plugin
 	protected void startUp() throws Exception
 	{
 		overlayManager.add(overlay);
+		sceptreChance.put(1, 1.0/3500);
+		sceptreChance.put(2, 1.0/2250);
+		sceptreChance.put(3, 1.0/1250);
+		sceptreChance.put(4, 1.0/750);
+		sceptreChance.put(5, 1.0/650);
+		sceptreChance.put(6, 1.0/650);
+		sceptreChance.put(7, 1.0/650);
+		sceptreChance.put(8, 1.0/650);
 	}
 
 	@Override
@@ -76,6 +93,9 @@ public class PyramidPlunderCounterPlugin extends Plugin
 				sarcoTimer -= 1;
 			} else if (sarcoTimer == 0 && !hasZombieSpawned) {
 				sarcoLooted += 1;
+				Double chance = sceptreChance.get(client.getVarbitValue(Varbits.PYRAMID_PLUNDER_ROOM));
+				totalChance *= (1-chance);
+				dryChance = 1-totalChance;
 				sarcoTimer = -1;
 				spawnedNPC.clear();
 			}
@@ -93,6 +113,9 @@ public class PyramidPlunderCounterPlugin extends Plugin
 					//Increment Chest count as you dont gain exp on unnsuccessful thieve.
 					totalChestLooted += 1;
 					chestLooted += 1;
+					Double chance = sceptreChance.get(client.getVarbitValue(Varbits.PYRAMID_PLUNDER_ROOM));
+					totalChance *= (1-chance);
+					dryChance = 1-totalChance;
 					usingChestOrSarco = false;
 				}
 			}

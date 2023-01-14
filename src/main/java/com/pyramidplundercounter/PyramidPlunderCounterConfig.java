@@ -46,4 +46,14 @@ public interface PyramidPlunderCounterConfig extends Config
 	default boolean showTotalSarcoLooted() {
 		return true;
 	}
+
+	@ConfigItem(
+			position = 4,
+			keyName = "showChance",
+			name = "% Chance of having received at least one sceptre",
+			description = "Displays the percentage chance of having received at least one sceptre."
+	)
+	default boolean showChance() {
+		return true;
+	}
 }
