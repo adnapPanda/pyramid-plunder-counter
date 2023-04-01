@@ -1,19 +1,20 @@
 package com.pyramidplundercounter;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.inject.Provides;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.NPC;
-import net.runelite.api.Skill;
-import net.runelite.api.Varbits;
+import net.runelite.api.*;
 import net.runelite.api.events.*;
+import net.runelite.client.RuneLite;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,9 +60,28 @@ public class PyramidPlunderCounterPlugin extends Plugin
 	@Inject
 	private PyramidPlunderCounterOverlay overlay;
 
+	private static Gson GSON;
+	public static File DATA_FOLDER;
+	static {
+		DATA_FOLDER = new File(RuneLite.RUNELITE_DIR, "pyramid-plunder-counter");
+		DATA_FOLDER.mkdirs();
+	}
+	boolean savedOutside = false;
+	boolean loadedSession = false;
+
 	@Override
 	protected void startUp() throws Exception
 	{
+		GSON = new GsonBuilder()
+			.setPrettyPrinting()
+				.create();
+
+		if (client.getGameState().equals(GameState.LOGGED_IN)
+			&& client.getLocalPlayer().getName() != null) {
+			importData();
+			loadedSession = true;
+		}
+
 		overlayManager.add(overlay);
 		sceptreChance.put(1, 1.0/3500);
 		sceptreChance.put(2, 1.0/2250);
@@ -77,6 +97,9 @@ public class PyramidPlunderCounterPlugin extends Plugin
 	protected void shutDown() throws Exception
 	{
 		overlayManager.remove(overlay);
+
+		String username = client.getLocalPlayer().getName();
+		if (username != null) exportData(new File(DATA_FOLDER, username + ".json"));
 	}
 
 	@Provides
@@ -88,6 +111,10 @@ public class PyramidPlunderCounterPlugin extends Plugin
 	@Subscribe
 	public void onGameTick(GameTick gameTick)
 	{
+		if (!loadedSession && client.getGameState().equals(GameState.LOGGED_IN)) {
+			importData();
+			loadedSession = true;
+		}
 		if (isInPyramidPlunder()) {
 			if (sarcoTimer > 0) {
 				sarcoTimer -= 1;
@@ -98,6 +125,13 @@ public class PyramidPlunderCounterPlugin extends Plugin
 				dryChance = 1-totalChance;
 				sarcoTimer = -1;
 				spawnedNPC.clear();
+				savedOutside = false;
+			}
+		} else if (!savedOutside) {
+			String username = client.getLocalPlayer().getName();
+			if (username != null) {
+				exportData(new File(DATA_FOLDER, username + ".json"));
+				savedOutside = true;
 			}
 		}
 	}
@@ -117,6 +151,7 @@ public class PyramidPlunderCounterPlugin extends Plugin
 					totalChance *= (1-chance);
 					dryChance = 1-totalChance;
 					usingChestOrSarco = false;
+					savedOutside = false;
 				}
 			}
 			else if (usingChestOrSarco && statChanged.getSkill() == Skill.STRENGTH) {
@@ -126,6 +161,7 @@ public class PyramidPlunderCounterPlugin extends Plugin
 				sarcoTimer = 7;
 				hasZombieSpawned = false;
 				usingChestOrSarco = false;
+				savedOutside = false;
 			}
 		}
 	}
@@ -179,5 +215,49 @@ public class PyramidPlunderCounterPlugin extends Plugin
 		return client.getLocalPlayer() != null
 				&& PYRAMID_PLUNDER_REGION == client.getLocalPlayer().getWorldLocation().getRegionID()
 				&& client.getVarbitValue(Varbits.PYRAMID_PLUNDER_TIMER) > 0;
+	}
+
+	private void exportData(File file) {
+		if (!config.saveData()) return;
+
+		PyramidPlunderCounterData data = new PyramidPlunderCounterData(
+			totalChestLooted, totalSarcoLooted, chestLooted, sarcoLooted, totalChance
+		);
+		try {
+			Writer writer = new FileWriter(file);
+            GSON.toJson(data, PyramidPlunderCounterData.class, writer);
+            writer.flush();
+            writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			log.error("Error while exporting Pyramid Plunder Counter data: " + e.getMessage());
+		}
+	}
+
+	private void importData() {
+		if (!config.saveData()) return;
+
+        DATA_FOLDER.mkdirs();
+        File data = new File(DATA_FOLDER, client.getLocalPlayer().getName() + ".json");
+
+		try {
+            if (!data.exists()) {
+                Writer writer = new FileWriter(data);
+                GSON.toJson(new PyramidPlunderCounterData(), PyramidPlunderCounterData.class, writer);
+                writer.flush();
+                writer.close();
+            } else {
+                PyramidPlunderCounterData importedData = GSON.fromJson(new FileReader(data), PyramidPlunderCounterData.class);
+                totalChestLooted = importedData.getTotalChests();
+                totalSarcoLooted = importedData.getTotalsarcophagi();
+                chestLooted = importedData.getSuccessfulChests();
+                sarcoLooted = importedData.getSuccessfulsarcophagi();
+                totalChance = importedData.getChanceOfBeingDry();
+                dryChance = 1 - totalChance;
+            }
+        } catch (IOException e) {
+			e.printStackTrace();
+			log.warn("Error while importing Pyramid Plunder Counter data: " + e.getMessage());
+		}
 	}
 }

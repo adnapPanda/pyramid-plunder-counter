@@ -56,4 +56,15 @@ public interface PyramidPlunderCounterConfig extends Config
 	default boolean showChance() {
 		return true;
 	}
+
+	@ConfigItem(
+			position = 5,
+			keyName = "saveData",
+			name = "Save your data",
+			description = "Save your data cross-sessions to keep track of it."
+	)
+
+	default boolean saveData() {
+		return true;
+	}
 }
