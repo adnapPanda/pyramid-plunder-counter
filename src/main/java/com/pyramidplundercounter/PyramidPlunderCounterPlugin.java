@@ -60,7 +60,8 @@ public class PyramidPlunderCounterPlugin extends Plugin
 	@Inject
 	private PyramidPlunderCounterOverlay overlay;
 
-	private static Gson GSON;
+	@Inject
+	private Gson GSON;
 	public static File DATA_FOLDER;
 	static {
 		DATA_FOLDER = new File(RuneLite.RUNELITE_DIR, "pyramid-plunder-counter");
@@ -72,10 +73,6 @@ public class PyramidPlunderCounterPlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-		GSON = new GsonBuilder()
-			.setPrettyPrinting()
-				.create();
-
 		if (client.getGameState().equals(GameState.LOGGED_IN)
 			&& client.getLocalPlayer().getName() != null) {
 			importData();
