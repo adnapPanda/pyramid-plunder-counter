@@ -11,7 +11,7 @@ public interface PyramidPlunderCounterConfig extends Config
 			position = 0,
 			keyName = "showChestsLooted",
 			name = "Chests Looted",
-			description = "Displays the number of chests successfully looted"
+			description = "Displays the number of chests looted"
 	)
 	default boolean showChestsLooted() {
 		return true;
@@ -21,7 +21,7 @@ public interface PyramidPlunderCounterConfig extends Config
 			position = 1,
 			keyName = "showSarcoLooted",
 			name = "Sarcophagus Looted",
-			description = "Displays the number of sarcophagus successfully looted"
+			description = "Displays the number of sarcophagus looted"
 	)
 	default boolean showSarcoLooted() {
 		return true;
@@ -29,26 +29,6 @@ public interface PyramidPlunderCounterConfig extends Config
 
 	@ConfigItem(
 			position = 2,
-			keyName = "showTotalChestsLooted",
-			name = "Total Chests Looted",
-			description = "Displays the number of total chests looted. This includes both successful and unsuccessful attempts."
-	)
-	default boolean showTotalChestsLooted() {
-		return true;
-	}
-
-	@ConfigItem(
-			position = 3,
-			keyName = "showTotalSarcoLooted",
-			name = "Total Sarcophagus Looted",
-			description = "Displays the number of total Sarcophagus looted. This includes both successful and unsuccessful attempts."
-	)
-	default boolean showTotalSarcoLooted() {
-		return true;
-	}
-
-	@ConfigItem(
-			position = 4,
 			keyName = "showChance",
 			name = "% Chance of having received at least one sceptre",
 			description = "Displays the percentage chance of having received at least one sceptre."
@@ -58,7 +38,7 @@ public interface PyramidPlunderCounterConfig extends Config
 	}
 
 	@ConfigItem(
-			position = 5,
+			position = 3,
 			keyName = "saveData",
 			name = "Save your data",
 			description = "Save your data cross-sessions to keep track of it."

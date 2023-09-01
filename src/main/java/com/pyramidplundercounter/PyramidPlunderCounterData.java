@@ -5,56 +5,36 @@ import com.google.gson.annotations.SerializedName;
 
 public class PyramidPlunderCounterData {
 
-    PyramidPlunderCounterData(int totalChests, int totalsarcophagi, int successfulChests, int successfulsarcophagi, Double chanceOfBeingDry) {
-        this.totalChests = totalChests;
-        this.totalsarcophagi = totalsarcophagi;
-        this.successfulChests = successfulChests;
-        this.successfulsarcophagi = successfulsarcophagi;
+    PyramidPlunderCounterData(int chestsLooted, int sarcoLooted, Double chanceOfBeingDry) {
+        this.chestsLooted = chestsLooted;
+        this.sarcoLooted = sarcoLooted;
         this.chanceOfBeingDry = chanceOfBeingDry;
     }
 
     PyramidPlunderCounterData() {
-        this.totalChests = 0;
-        this.totalsarcophagi = 0;
-        this.successfulChests = 0;
-        this.successfulsarcophagi = 0;
+        this.chestsLooted = 0;
+        this.sarcoLooted = 0;
         this.chanceOfBeingDry = 1.0;
     }
 
     @Expose
-    @SerializedName("total-chests")
-    private final int totalChests;
-
-    @Expose
-    @SerializedName("total-sarcophagi")
-    private final int totalsarcophagi;
-
-    @Expose
     @SerializedName("successful-chests")
-    private final int successfulChests;
+    private final int chestsLooted;
 
     @Expose
     @SerializedName("successful-sarcophagi")
-    private final int successfulsarcophagi;
+    private final int sarcoLooted;
 
     @Expose
     @SerializedName("chance-of-being-dry")
     private final Double chanceOfBeingDry;
 
-    public int getTotalChests() {
-        return totalChests;
+    public int getChestsLooted() {
+        return chestsLooted;
     }
 
-    public int getTotalsarcophagi() {
-        return totalsarcophagi;
-    }
-
-    public int getSuccessfulChests() {
-        return successfulChests;
-    }
-
-    public int getSuccessfulsarcophagi() {
-        return successfulsarcophagi;
+    public int getSarcoLooted() {
+        return sarcoLooted;
     }
 
     public Double getChanceOfBeingDry() {
