@@ -25,12 +25,16 @@ import java.util.List;
 )
 public class PyramidPlunderCounterPlugin extends Plugin
 {
-	// Drop Chances
-	// Room 1 = 1/3500 0.000286
-	// Room 2 = 1/2250 0.000444
-	// Room 3 = 1/1250 0.0008
-	// Room 4 = 1/750 0.001333
-	// Room 5-8 = 1/650 0.001538
+	// Drop Chances - https://secure.runescape.com/m=news/poll-80-toa-changes--dmm-tweaks?oldschool=1
+	// Room 1 = 1/4200
+	// Room 2 = 1/2800
+	// Room 3 = 1/1600
+	// Room 4 = 1/950
+	// Room 5 = 1/800
+	// Room 6 = 1/750
+	// Room 7 = 1/650
+	// Room 8 = 1/650
+
 	private HashMap<Integer, Double> sceptreChance = new HashMap<>();
 	private static final int PYRAMID_PLUNDER_REGION = 7749;
 	static final String GRAND_GOLD_CHEST_TARGET = "<col=ffff>Grand Gold Chest";
@@ -80,12 +84,12 @@ public class PyramidPlunderCounterPlugin extends Plugin
 		}
 
 		overlayManager.add(overlay);
-		sceptreChance.put(1, 1.0/3500);
-		sceptreChance.put(2, 1.0/2250);
-		sceptreChance.put(3, 1.0/1250);
-		sceptreChance.put(4, 1.0/750);
-		sceptreChance.put(5, 1.0/650);
-		sceptreChance.put(6, 1.0/650);
+		sceptreChance.put(1, 1.0/4200);
+		sceptreChance.put(2, 1.0/2800);
+		sceptreChance.put(3, 1.0/1600);
+		sceptreChance.put(4, 1.0/950);
+		sceptreChance.put(5, 1.0/800);
+		sceptreChance.put(6, 1.0/750);
 		sceptreChance.put(7, 1.0/650);
 		sceptreChance.put(8, 1.0/650);
 	}
