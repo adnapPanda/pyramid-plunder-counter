@@ -40,7 +40,7 @@ class PyramidPlunderCounterOverlay extends OverlayPanel {
 
             if (config.showSarcoLooted())
                 elems.add(LineComponent.builder()
-                        .left("Total Sarcophagus Looted:")
+                        .left("Total Sarcophagi Looted:")
                         .right(String.format("%d", plugin.sarcoLooted))
                         .build());
 
