@@ -49,6 +49,12 @@ class PyramidPlunderCounterOverlay extends OverlayPanel {
                         .left("% Chance of at least one Sceptre:")
                         .right(String.format("%f", plugin.dryChance*100))
                         .build());
+
+            if (config.showPetChance())
+                elems.add(LineComponent.builder()
+                        .left("% Chance of pet:")
+                        .right(String.format("%f", plugin.petDryChance*100))
+                        .build());
         }
         return super.render(graphics);
     }

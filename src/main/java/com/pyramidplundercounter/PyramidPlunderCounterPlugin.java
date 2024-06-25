@@ -35,6 +35,7 @@ public class PyramidPlunderCounterPlugin extends Plugin
 	// Room 7 = 1/650
 	// Room 8 = 1/650
 	private HashMap<Integer, Double> sceptreChance = new HashMap<>();
+	private HashMap<Integer, Integer> petBaseChance = new HashMap<>();
 	private static final int PYRAMID_PLUNDER_REGION = 7749;
 	static final String GRAND_GOLD_CHEST_TARGET = "<col=ffff>Grand Gold Chest";
 	static final String SARCOPHAGUS_TARGET = "<col=ffff>Sarcophagus";
@@ -42,6 +43,8 @@ public class PyramidPlunderCounterPlugin extends Plugin
 	int chestLooted = 0, sarcoLooted = 0;
 	double totalChance = 1;
 	double dryChance = 0;
+	double totalPetChance = 1;
+	double petDryChance = 0;
 
 	boolean usingChestOrSarco = false;
 	boolean usingSpearTrap = false;
@@ -89,6 +92,15 @@ public class PyramidPlunderCounterPlugin extends Plugin
 		sceptreChance.put(6, 1.0/750);
 		sceptreChance.put(7, 1.0/650);
 		sceptreChance.put(8, 1.0/650);
+
+		petBaseChance.put(1, 41355);
+		petBaseChance.put(2, 29540);
+		petBaseChance.put(3, 25847);
+		petBaseChance.put(4, 20678);
+		petBaseChance.put(5, 20678);
+		petBaseChance.put(6, 20678);
+		petBaseChance.put(7, 10339);
+		petBaseChance.put(8, 6893);
 	}
 
 	@Override
@@ -134,6 +146,12 @@ public class PyramidPlunderCounterPlugin extends Plugin
 					Double chance = sceptreChance.get(client.getVarbitValue(Varbits.PYRAMID_PLUNDER_ROOM));
 					totalChance *= (1-chance);
 					dryChance = 1-totalChance;
+					int baseChanceModifier = client.getRealSkillLevel(Skill.THIEVING) * 25;
+					int realPetChance = petBaseChance.get(client.getVarbitValue(Varbits.PYRAMID_PLUNDER_ROOM)) - baseChanceModifier;
+					double petChance = 1.0D / realPetChance;
+					totalPetChance *= (1-petChance);
+					petDryChance = 1-totalPetChance;
+
 					usingChestOrSarco = false;
 					savedOutside = false;
 				}
@@ -186,6 +204,11 @@ public class PyramidPlunderCounterPlugin extends Plugin
 				Double chance = sceptreChance.get(client.getVarbitValue(Varbits.PYRAMID_PLUNDER_ROOM));
 				totalChance *= (1-chance);
 				dryChance = 1-totalChance;
+				int baseChanceModifier = client.getRealSkillLevel(Skill.THIEVING) * 25;
+				int realPetChance = petBaseChance.get(client.getVarbitValue(Varbits.PYRAMID_PLUNDER_ROOM)) - baseChanceModifier;
+				double petChance = 1.0D / realPetChance;
+				totalPetChance *= (1-petChance);
+				petDryChance = 1-totalPetChance;
 				spawnedNPC.clear();
 			}
 		}
@@ -202,7 +225,7 @@ public class PyramidPlunderCounterPlugin extends Plugin
 		if (!config.saveData()) return;
 
 		PyramidPlunderCounterData data = new PyramidPlunderCounterData(
-			chestLooted, sarcoLooted, totalChance
+			chestLooted, sarcoLooted, totalChance, totalPetChance
 		);
 		try {
 			Writer writer = new FileWriter(file);
@@ -232,7 +255,9 @@ public class PyramidPlunderCounterPlugin extends Plugin
                 chestLooted = importedData.getChestsLooted();
                 sarcoLooted = importedData.getSarcoLooted();
                 totalChance = importedData.getChanceOfBeingDry();
+				totalPetChance = importedData.getPetChanceOfBeingDry();
                 dryChance = 1 - totalChance;
+				petDryChance = 1 - totalPetChance;
             }
         } catch (IOException e) {
 			e.printStackTrace();

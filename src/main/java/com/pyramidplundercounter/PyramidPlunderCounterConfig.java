@@ -39,6 +39,16 @@ public interface PyramidPlunderCounterConfig extends Config
 
 	@ConfigItem(
 			position = 3,
+			keyName = "showPetChance",
+			name = "% Chance of having received pet",
+			description = "Displays the percentage chance of having received at least one pet."
+	)
+	default boolean showPetChance() {
+		return true;
+	}
+
+	@ConfigItem(
+			position = 4,
 			keyName = "saveData",
 			name = "Save your data",
 			description = "Save your data cross-sessions to keep track of it."

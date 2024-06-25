@@ -5,16 +5,18 @@ import com.google.gson.annotations.SerializedName;
 
 public class PyramidPlunderCounterData {
 
-    PyramidPlunderCounterData(int chestsLooted, int sarcoLooted, Double chanceOfBeingDry) {
+    PyramidPlunderCounterData(int chestsLooted, int sarcoLooted, Double chanceOfBeingDry, Double petChanceOfBeingDry) {
         this.chestsLooted = chestsLooted;
         this.sarcoLooted = sarcoLooted;
         this.chanceOfBeingDry = chanceOfBeingDry;
+        this.petChanceOfBeingDry = petChanceOfBeingDry;
     }
 
     PyramidPlunderCounterData() {
         this.chestsLooted = 0;
         this.sarcoLooted = 0;
         this.chanceOfBeingDry = 1.0;
+        this.petChanceOfBeingDry = 1.0;
     }
 
     @Expose
@@ -29,6 +31,10 @@ public class PyramidPlunderCounterData {
     @SerializedName("chance-of-being-dry")
     private final Double chanceOfBeingDry;
 
+    @Expose
+    @SerializedName("pet-chance-of-being-dry")
+    private final Double petChanceOfBeingDry;
+
     public int getChestsLooted() {
         return chestsLooted;
     }
@@ -39,5 +45,9 @@ public class PyramidPlunderCounterData {
 
     public Double getChanceOfBeingDry() {
         return chanceOfBeingDry;
+    }
+
+    public Double getPetChanceOfBeingDry() {
+        return petChanceOfBeingDry;
     }
 }
