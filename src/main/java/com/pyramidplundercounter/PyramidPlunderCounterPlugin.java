@@ -255,9 +255,9 @@ public class PyramidPlunderCounterPlugin extends Plugin
                 chestLooted = importedData.getChestsLooted();
                 sarcoLooted = importedData.getSarcoLooted();
                 totalChance = importedData.getChanceOfBeingDry();
-				totalPetChance = importedData.getPetChanceOfBeingDry();
+		totalPetChance = importedData.getPetChanceOfBeingDry();
                 dryChance = 1 - totalChance;
-				petDryChance = 1 - totalPetChance;
+		petDryChance = 1 - totalPetChance;
             }
         } catch (IOException e) {
 			e.printStackTrace();
