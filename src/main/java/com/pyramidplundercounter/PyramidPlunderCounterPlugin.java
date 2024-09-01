@@ -1,7 +1,8 @@
 package com.pyramidplundercounter;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonParseException;
 import com.google.inject.Provides;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,8 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -227,14 +230,10 @@ public class PyramidPlunderCounterPlugin extends Plugin
 		PyramidPlunderCounterData data = new PyramidPlunderCounterData(
 			chestLooted, sarcoLooted, totalChance, totalPetChance
 		);
-		try {
-			Writer writer = new FileWriter(file);
+		try (Writer writer = new FileWriter(file)) {
             GSON.toJson(data, PyramidPlunderCounterData.class, writer);
-            writer.flush();
-            writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			log.error("Error while exporting Pyramid Plunder Counter data: " + e.getMessage());
+		} catch (IOException | JsonIOException e) {
+			log.error("Error while exporting Pyramid Plunder Counter data", e);
 		}
 	}
 
@@ -242,26 +241,43 @@ public class PyramidPlunderCounterPlugin extends Plugin
 		if (!config.saveData()) return;
 
         DATA_FOLDER.mkdirs();
-        File data = new File(DATA_FOLDER, client.getLocalPlayer().getName() + ".json");
+		String playerName = client.getLocalPlayer().getName();
+        File data = new File(DATA_FOLDER, playerName + ".json");
 
-		try {
-            if (!data.exists()) {
-                Writer writer = new FileWriter(data);
-                GSON.toJson(new PyramidPlunderCounterData(), PyramidPlunderCounterData.class, writer);
-                writer.flush();
-                writer.close();
-            } else {
-                PyramidPlunderCounterData importedData = GSON.fromJson(new FileReader(data), PyramidPlunderCounterData.class);
-                chestLooted = importedData.getChestsLooted();
-                sarcoLooted = importedData.getSarcoLooted();
-                totalChance = importedData.getChanceOfBeingDry();
-		totalPetChance = importedData.getPetChanceOfBeingDry();
-                dryChance = 1 - totalChance;
-		petDryChance = 1 - totalPetChance;
-            }
+		if (!data.exists()) {
+			initializeCounterDataFile(data);
+			return;
+		}
+
+		try (Reader reader = new FileReader(data)) {
+			PyramidPlunderCounterData importedData = GSON.fromJson(reader, PyramidPlunderCounterData.class);
+			chestLooted = importedData.getChestsLooted();
+			sarcoLooted = importedData.getSarcoLooted();
+			totalChance = importedData.getChanceOfBeingDry();
+			totalPetChance = importedData.getPetChanceOfBeingDry();
+			dryChance = 1 - totalChance;
+			petDryChance = 1 - totalPetChance;
         } catch (IOException e) {
-			e.printStackTrace();
-			log.warn("Error while importing Pyramid Plunder Counter data: " + e.getMessage());
+			log.warn("Error while reading Pyramid Plunder Counter data", e);
+		} catch (JsonParseException e) {
+			log.warn("Error while importing Pyramid Plunder Counter data", e);
+
+			// the file contains invalid json, let's get rid of it
+            try {
+				Path sourcePath = data.toPath();
+                Files.move(sourcePath, sourcePath.resolveSibling(String.format("%s-corrupt-%d.json", playerName, System.currentTimeMillis())));
+				initializeCounterDataFile(data);
+            } catch (IOException ex) {
+				log.warn("Could not neutralize corrupted Pyramid Plunder Counter data", ex);
+            }
+        }
+	}
+
+	private void initializeCounterDataFile(File data) {
+		try (Writer writer = new FileWriter(data)) {
+			GSON.toJson(new PyramidPlunderCounterData(), PyramidPlunderCounterData.class, writer);
+		} catch (IOException | JsonIOException e) {
+			log.warn("Error while initializing Pyramid Plunder Counter data file", e);
 		}
 	}
 }
