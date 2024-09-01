@@ -1,6 +1,8 @@
 package com.pyramidplundercounter;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonParseException;
 import com.google.inject.Provides;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,8 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -228,7 +232,7 @@ public class PyramidPlunderCounterPlugin extends Plugin
 		);
 		try (Writer writer = new FileWriter(file)) {
             GSON.toJson(data, PyramidPlunderCounterData.class, writer);
-		} catch (IOException e) {
+		} catch (IOException | JsonIOException e) {
 			log.error("Error while exporting Pyramid Plunder Counter data", e);
 		}
 	}
@@ -237,14 +241,11 @@ public class PyramidPlunderCounterPlugin extends Plugin
 		if (!config.saveData()) return;
 
         DATA_FOLDER.mkdirs();
-        File data = new File(DATA_FOLDER, client.getLocalPlayer().getName() + ".json");
+		String playerName = client.getLocalPlayer().getName();
+        File data = new File(DATA_FOLDER, playerName + ".json");
 
 		if (!data.exists()) {
-			try (Writer writer = new FileWriter(data)) {
-				GSON.toJson(new PyramidPlunderCounterData(), PyramidPlunderCounterData.class, writer);
-			} catch (IOException e) {
-				log.warn("Error while initializing Pyramid Plunder Counter data file", e);
-			}
+			initializeCounterDataFile(data);
 			return;
 		}
 
@@ -257,7 +258,26 @@ public class PyramidPlunderCounterPlugin extends Plugin
 			dryChance = 1 - totalChance;
 			petDryChance = 1 - totalPetChance;
         } catch (IOException e) {
+			log.warn("Error while reading Pyramid Plunder Counter data", e);
+		} catch (JsonParseException e) {
 			log.warn("Error while importing Pyramid Plunder Counter data", e);
+
+			// the file contains invalid json, let's get rid of it
+            try {
+				Path sourcePath = data.toPath();
+                Files.move(sourcePath, sourcePath.resolveSibling(String.format("%s-corrupt-%d.json", playerName, System.currentTimeMillis())));
+				initializeCounterDataFile(data);
+            } catch (IOException ex) {
+				log.warn("Could not neutralize corrupted Pyramid Plunder Counter data", ex);
+            }
+        }
+	}
+
+	private void initializeCounterDataFile(File data) {
+		try (Writer writer = new FileWriter(data)) {
+			GSON.toJson(new PyramidPlunderCounterData(), PyramidPlunderCounterData.class, writer);
+		} catch (IOException | JsonIOException e) {
+			log.warn("Error while initializing Pyramid Plunder Counter data file", e);
 		}
 	}
 }
