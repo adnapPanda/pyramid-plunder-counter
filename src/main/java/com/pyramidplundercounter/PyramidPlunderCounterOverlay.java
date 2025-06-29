@@ -10,6 +10,8 @@ import javax.inject.Inject;
 import java.awt.*;
 import java.util.List;
 
+import static net.runelite.api.MenuAction.RUNELITE_OVERLAY;
+
 class PyramidPlunderCounterOverlay extends OverlayPanel {
 
     private Client client;
@@ -24,6 +26,12 @@ class PyramidPlunderCounterOverlay extends OverlayPanel {
         this.config = config;
 
         setPosition(OverlayPosition.TOP_LEFT);
+        addMenuEntry(RUNELITE_OVERLAY, "Reset", "Chests Looted");
+        addMenuEntry(RUNELITE_OVERLAY, "Reset", "Sarcophagus Looted");
+        addMenuEntry(RUNELITE_OVERLAY, "Reset", "Chests since last sceptre");
+        addMenuEntry(RUNELITE_OVERLAY, "Reset", "Sarcos since last sceptre");
+        addMenuEntry(RUNELITE_OVERLAY, "Reset", "Sceptre Chance");
+        addMenuEntry(RUNELITE_OVERLAY, "Reset", "Pet Chance");
     }
 
     @Override
@@ -44,6 +52,18 @@ class PyramidPlunderCounterOverlay extends OverlayPanel {
                         .right(String.format("%d", plugin.sarcoLooted))
                         .build());
 
+            if (config.showChestsSinceLastSceptre())
+                elems.add(LineComponent.builder()
+                        .left("Chests Since Last Sceptre:")
+                        .right(String.format("%d", plugin.chestSinceLastSceptre))
+                        .build());
+
+            if (config.showSarcosSinceLastSceptre())
+                elems.add(LineComponent.builder()
+                        .left("Sarcos Since Last Sceptre:")
+                        .right(String.format("%d", plugin.sarcoSinceLastSceptre))
+                        .build());
+
             if (config.showChance())
                 elems.add(LineComponent.builder()
                         .left("% Chance of at least one Sceptre:")
@@ -55,6 +75,10 @@ class PyramidPlunderCounterOverlay extends OverlayPanel {
                         .left("% Chance of pet:")
                         .right(String.format("%f", plugin.petDryChance*100))
                         .build());
+
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("\nShift right-click this box to reset specific totals.")
+                    .build());
         }
         return super.render(graphics);
     }

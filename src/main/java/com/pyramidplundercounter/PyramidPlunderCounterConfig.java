@@ -29,6 +29,26 @@ public interface PyramidPlunderCounterConfig extends Config
 
 	@ConfigItem(
 			position = 2,
+			keyName = "showChestsSinceLastSceptre",
+			name = "Chests since last Sceptre",
+			description = "Displays the number of chests looted since receiving the latest sceptre"
+	)
+	default boolean showChestsSinceLastSceptre() {
+		return true;
+	}
+
+	@ConfigItem(
+			position = 3,
+			keyName = "showSarcoSinceLastSceptre",
+			name = "Sarcos since last Sceptre",
+			description = "Displays the number of sarcos looted since receiving the latest sceptre"
+	)
+	default boolean showSarcosSinceLastSceptre() {
+		return true;
+	}
+
+	@ConfigItem(
+			position = 4,
 			keyName = "showChance",
 			name = "% Chance of having received at least one sceptre",
 			description = "Displays the percentage chance of having received at least one sceptre."
@@ -38,7 +58,7 @@ public interface PyramidPlunderCounterConfig extends Config
 	}
 
 	@ConfigItem(
-			position = 3,
+			position = 5,
 			keyName = "showPetChance",
 			name = "% Chance of having received pet",
 			description = "Displays the percentage chance of having received at least one pet."
@@ -48,7 +68,7 @@ public interface PyramidPlunderCounterConfig extends Config
 	}
 
 	@ConfigItem(
-			position = 4,
+			position = 6,
 			keyName = "saveData",
 			name = "Save your data",
 			description = "Save your data cross-sessions to keep track of it."
