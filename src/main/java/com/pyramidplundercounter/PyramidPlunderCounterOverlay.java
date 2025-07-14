@@ -76,9 +76,10 @@ class PyramidPlunderCounterOverlay extends OverlayPanel {
                         .right(String.format("%f", plugin.petDryChance*100))
                         .build());
 
-            panelComponent.getChildren().add(LineComponent.builder()
-                    .left("\nShift right-click this box to reset specific totals.")
-                    .build());
+            if (config.showResetTooltip())
+                panelComponent.getChildren().add(LineComponent.builder()
+                        .left("\nShift right-click this box to reset specific totals.")
+                        .build());
         }
         return super.render(graphics);
     }

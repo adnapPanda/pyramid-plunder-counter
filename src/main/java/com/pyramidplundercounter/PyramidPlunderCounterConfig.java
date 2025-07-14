@@ -77,4 +77,15 @@ public interface PyramidPlunderCounterConfig extends Config
 	default boolean saveData() {
 		return true;
 	}
+
+	@ConfigItem(
+			position = 7,
+			keyName = "showResetTooltip",
+			name = "Show tooltip on how to reset your data",
+			description = "Shows a tooltip on how to reset your data."
+	)
+
+	default boolean showResetTooltip() {
+		return false;
+	}
 }
